@@ -441,20 +441,42 @@ flights %>%
 
 # Filter flights to keep only flights that departed JFK and arrived at ATL. Keep only origin, destination, arrival delay,  departure delay,and carrier. Create a ggplot scatterplot showing the relationship between departure delay and  arrival delay. Add carrier as color.
 flights %>% 
-  filter(flights, origin=="JFK" & dest=="ATL") %>% 
-  select(flights, origin, dest, arr_delay, dep_delay, carrier) %>% 
-  ggplot(aes(x=reorder(dest,-number), y=number))+
-  geom_bar(stat="identity")
+  filter(origin=="JFK" & dest=="ATL") %>% 
+  select(origin, dest, arr_delay, dep_delay, carrier) %>% 
+  ggplot(aes(x=dep_delay, y=arr_delay, color=carrier))+
+  geom_point(alpha=.25)
 
 # To which airports did the most flights from NYC go? Make a ggplot visualization.
-ggplot(aes(x=reorder(dest,-number), y=number))+
-  geom_bar(stat="identity")
+flights %>% 
+  filter(origin=="EWR"|origin=="LGA"|origin=="JFK") %>% 
+  group_by(dest) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  head(n=10) %>% 
+  ggplot(aes(x=reorder(dest, -n), y=n))+
+  geom_bar(stat = "identity")
+# ORD, ATL, and LAX
   
 # Which carrier had the shortest mean arrival delay?
-# I don't know. I cannot figure out how to do these last few questions.
+flights %>% 
+  group_by(carrier) %>% 
+  select(arr_delay) %>% 
+  arrange(arr_delay)
+# VX
 
-# Which carrier experienced the most cancelled flights?
-# I don't know. I cannot figure out how to do these last few questions.
-
+# Which carrier experienced the most canceled flights?
+names(flights)
+flights %>% 
+  group_by(carrier) %>% 
+  select(dep_time) %>% 
+  arrange(desc(dep_time))
+# MQ
+  
 # On average, which carrier flew fastest.
-# I don't know. I cannot figure out how to do these last few questions.
+names(flights)
+flights %>% 
+  mutate(speed = distance / air_time) %>% 
+  group_by(carrier) %>% 
+  summarise(mean_speed = mean(speed, na.rm = TRUE)) %>% 
+  arrange(desc(mean_speed))
+# HA
